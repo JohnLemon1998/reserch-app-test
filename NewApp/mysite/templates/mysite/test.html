@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>お絵描き DEMO</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</head>
+
+<style>
+#peke{font-size:50px;}
+
+body{background-color:#90ee90;}
+</style>
+
+<body>
+  {% for image in images %}
+    <img id="{{image.pk}}" src="{{image.final_images.url}}" alt="nope" width="100" height="150" onclick="image_func({{image.pk}})">
+  {% endfor %}
+
+    <p id="kakko"></p>
+
+   <p id="peke" style="visibility:hidden;">❌</p>
+
+   <form method="post" name="yeah">
+     {% csrf_token %}
+     {{ form.finished_time.as_hidden }}
+     {{ form.mistake_count.as_hidden }}
+   </form>
+
+<a href="{% url 'hundred' %}">
+<button type="button" name="button">終了</button>
+</a>
+
+
+</body>
+
+<script>
+
+var time = 0;
+var time_count = function(){
+  time++;
+}
+setInterval(time_count,1000);
+
+var mistake_count = 0;
+
+var rand_num =　[];
+{% for image in images %}
+  rand_num.push({{image.pk}}-1)
+{% endfor %}
+
+console.log(rand_num)
+
+var min_val = Math.min.apply(null,rand_num);
+
+const shuffle = ([...array]) => {
+  for (let i = array.length - 1; i >= 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+rand_num=shuffle(rand_num);
+var music;
+
+var i=0;
+function next_question(){
+
+  if(i==15){
+    document.getElementById('id_finished_time').value=time;
+    document.getElementById('id_mistake_count').value=mistake_count;
+    console.log(document.getElementById('id_finished_time').value);
+    console.log(document.getElementById('id_mistake_count').value);
+    document.yeah.submit();
+  }
+
+  if(min_val!=0){
+  var num = rand_num[i]%min_val;
+}else{
+  var num = rand_num[i];
+}
+
+var tt;
+  switch (num) {
+    case 0:tt="{{words.0.meaning}}";
+          music = new Audio('/images/sound/test0.mp3');
+          music.play(); break;
+    case 1:tt="{{words.1.meaning}}";
+          music = new Audio('/images/sound/test1.mp3');
+          music.play(); break;
+    case 2:tt="{{words.2.meaning}}"; break;
+    case 3:tt="{{words.3.meaning}}"; break;
+    case 4:tt="{{words.4.meaning}}"; break;
+    case 5:tt="{{words.5.meaning}}"; break;
+    case 6:tt="{{words.6.meaning}}"; break;
+    case 7:tt="{{words.7.meaning}}"; break;
+    case 8:tt="{{words.8.meaning}}"; break;
+    case 9:tt="{{words.9.meaning}}"; break;
+    case 10:tt="{{words.10.meaning}}"; break;
+    case 11:tt="{{words.11.meaning}}"; break;
+    case 12:tt="{{words.12.meaning}}"; break;
+    case 13:tt="{{words.13.meaning}}"; break;
+    case 14:tt="{{words.14.meaning}}"; break;
+  }
+  document.getElementById("kakko").innerHTML = tt;
+ i++;
+}
+
+next_question();
+
+var z_num = 0;
+function image_func(num){
+
+  var heyheyhey = document.getElementById(num);
+
+  if(rand_num[i-1]+1==num){
+  heyheyhey.style.position = "absolute";
+  heyheyhey.style.top = 500+"px";
+  heyheyhey.style.left = 250+"px";
+  heyheyhey.style.zIndex = z_num;
+  z_num +=10;
+  next_question();
+}else{
+  var peke = document.getElementById("peke");
+  var rect = heyheyhey.getBoundingClientRect();
+  var x1 = rect.top+window.pageYOffset;
+  var y1 = rect.left+window.pageXOffset;
+
+  peke.style.position= "absolute";
+
+  peke.style.top = (x1-10)+"px";
+  peke.style.left = (y1+30)+"px";
+
+  peke.style.visibility = "visible";
+  $("#peke").fadeOut(600,inFunc);
+
+function inFunc(){
+  peke.style.visibility="hidden"
+  $("#peke").fadeIn();
+  mistake_count++;
+}
+}
+}
+
+
+
+</script>
+
+</html>

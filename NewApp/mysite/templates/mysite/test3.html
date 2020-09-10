@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Swiper demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+  <!-- Demo styles -->
+  <style>
+    .option{
+      width: 250px;
+    }
+    .color > a{
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+    }
+    .black{
+      background-color: #000000;
+    }
+    .eraser{
+      width:10px;
+      height:10px;
+    }
+    .screen{
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+   .area {
+  width: 500px;
+  margin: auto;
+  flex-wrap: wrap;
+  display: flex;
+  }
+ .tab_class {
+  width: calc(100%/4);
+  height: 50px;
+  background-color: darkgrey;
+  line-height: 50px;
+  font-size: 15px;
+  text-align: center;
+  display: block;
+  float: left;
+  order: -1;
+  }
+input[name="tab_name"] {
+  display: none;
+}
+
+input:checked + .tab_class {
+  background-color: cadetblue;
+  color: aliceblue;
+ }
+ .content_class {
+  display: none;
+  width: 100%;
+}
+ input:checked + .tab_class + .content_class {
+  display: block;
+}
+  </style>
+</head>
+<body>
+  <div class="area">
+      <input type="radio" name="tab_name" id="tab1" checked>
+      <label class="tab_class" for="tab1">1~4</label>
+      <div class="content_class">
+        <div class="screen">
+         <canvas id="canvas0"  width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+         <canvas id="canvas1" width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+         <canvas id="canvas2"  width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+         <canvas id="canvas3" width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+       </div>
+      </div>
+      <input type="radio" name="tab_name" id="tab2" >
+      <label class="tab_class" for="tab2">5~7</label>
+      <div class="content_class">
+        <div class="screen">
+         <canvas id="canvas4"  width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+         <canvas id="canvas5" width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+         <canvas id="canvas6"  width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+         <canvas id="canvas7" width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+       </div>
+      </div>
+      <input type="radio" name="tab_name" id="tab3" >
+      <label class="tab_class" for="tab3">8~11</label>
+      <div class="content_class">
+        <div class="screen">
+         <canvas id="canvas8"  width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+         <canvas id="canvas9" width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+         <canvas id="canvas10"  width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+         <canvas id="canvas11" width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+       </div>
+      </div>
+      <input type="radio" name="tab_name" id="tab4" >
+      <label class="tab_class" for="tab4">12~14</label>
+      <div class="content_class">
+        <div class="screen">
+         <canvas id="canvas12"  width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+         <canvas id="canvas13" width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+         <canvas id="canvas14"  width="248" height="280" style="border: solid 1px #000;box-sizing: border-box;"></canvas>
+       </div>
+      </div>
+      <div class="content_class">
+      </div>
+    </div>
+
+    <div class="option">
+      <div class="color">
+        <a href="" class="eraser" data-color="255, 255, 255, 1"><img src="https://tsukatte.com/wp-content/uploads/2019/07/eraser.png" width="30" height="30"></a>
+        <a href="" class="black" data-color="0, 0, 0, 1"><img src="https://www.silhouette-illust.com/wp-content/uploads/2016/05/2237-300x300.jpg" width="30" height="30"></a>
+      </div>
+      <div class="bold">
+        <a href="" class="small" data-bold="1">小</a>
+        <a href="" class="middle" data-bold="5">中</a>
+        <a href="" class="large" data-bold="10">大</a>
+       </div>
+    </div>
+
+    <form method="post" name="test3">
+      {% csrf_token %}
+      {{form.image0.as_hidden}}
+      {{form.image1.as_hidden}}
+      {{form.image2.as_hidden}}
+      {{form.image3.as_hidden}}
+      {{form.image4.as_hidden}}
+      {{form.image5.as_hidden}}
+      {{form.image6.as_hidden}}
+      {{form.image7.as_hidden}}
+      {{form.image8.as_hidden}}
+      {{form.image9.as_hidden}}
+      {{form.image10.as_hidden}}
+      {{form.image11.as_hidden}}
+      {{form.image12.as_hidden}}
+      {{form.image13.as_hidden}}
+      {{form.image14.as_hidden}}
+      <input type="submit" value="提出" onclick="save()">
+    </form>
+
+    <script>
+    // 変数宣言
+    const cnvWidth = 500;
+    const cnvHeight = 500;
+    var cnvColor = "0, 0, 0, 1";  // 線の色
+    var cnvBold = 5;  // 線の太さ
+    var clickFlg = 0;  // クリック中の判定 1:クリック開始 2:クリック中
+    var bgColor = "rgb(255,255,255)";
+
+    var cnvs_array = new Array(15);
+    var ctx_array = new Array(15);
+
+    // canvas
+    var i=0;
+    while(i<15){
+        cnvs_array[i]= document.getElementById('canvas'+String(i));
+        ctx_array[i]=cnvs_array[i].getContext('2d');
+        i++;
+    };
+
+    setBGcolor();
+
+    $("#canvas0").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 0;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas1").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 1;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas2").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 2;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas3").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 3;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas4").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 4;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas5").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 5;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas6").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 6;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas7").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 7;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas8").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 8;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas9").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 9;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas10").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 10;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas11").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 11;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas12").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 12;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas13").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 13;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    $("#canvas14").mousedown(function(){
+      clickFlg = 1; // マウス押下開始
+    }).mouseup(function(){
+      clickFlg = 0; // マウス押下終了
+    }).mousemove(function(e){
+      // マウス移動処理
+      if(!clickFlg) return false;
+      var z = 14;
+      draw(e.offsetX, e.offsetY,z);
+    });
+
+    function draw(x, y, z) {
+      ctx_array[z].lineWidth = cnvBold;
+      ctx_array[z].strokeStyle = 'rgba('+cnvColor+')';
+      // 初回処理の判定
+      if (clickFlg == "1") {
+        clickFlg = "2";
+        ctx_array[z].beginPath();
+        ctx_array[z].lineCap = "round";  //　線を角丸にする
+        ctx_array[z].moveTo(x, y);
+      } else {
+        ctx_array[z].lineTo(x, y);
+      }
+      ctx_array[z].stroke();
+    };
+
+      // 色の変更
+      $(".color a").click(function(){
+        cnvColor = $(this).data("color");
+        return false;
+      });
+
+      // 線の太さ変更
+      $(".bold a").click(function(){
+        cnvBold = $(this).data("bold");
+        return false;
+      });
+
+      function save(){
+          for(var i=0;i<15;i++){
+            var submit_name = "id_image"+i;
+            document.getElementById(submit_name).value=cnvs_array[i].toDataURL('image/png');
+          }
+          document.test3.submit();
+        }
+
+        function setBGcolor(){
+          for(var i=0;i<15;i++){
+            ctx_array[i].fillStyle = bgColor;
+            ctx_array[i].fillRect(0,0,cnvWidth,cnvHeight);
+            }
+        }
+  </script>
+
+</body>
+</html>
